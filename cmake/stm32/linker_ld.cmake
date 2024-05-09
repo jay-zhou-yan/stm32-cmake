@@ -29,6 +29,15 @@ MB_MEM2 (NOLOAD)       : { _sMB_MEM2 = . ; *(MB_MEM2) ; _eMB_MEM2 = . ; } >RAM_S
     ")
 endif()
 
+# STM32CubeIDE 1.15.0: elf has a LOAD segment with RWX permissions
+# solution: https://community.st.com/t5/stm32cubeide-mcus/stm32cubeide-1-15-0-elf-has-a-load-segment-with-rwx-permissions/td-p/652335
+# There must be an additional (READONLY) at these positions:
+# .ARM.extab (READONLY) :
+# .ARM (READONLY) :
+# .preinit_array (READONLY) :
+# .init_array (READONLY) :
+# .fini_array (READONLY) :
+
 set(SCRIPT_TEXT 
 "ENTRY(Reset_Handler)\n\
 \n\
@@ -77,27 +86,27 @@ SECTIONS\n\
     . = ALIGN(4);\n\
   } >FLASH\n\
 \n\
-  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH\n\
+  .ARM.extab (READONLY) : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH\n\
   .ARM : {\n\
     __exidx_start = .;\n\
     *(.ARM.exidx*)\n\
     __exidx_end = .;\n\
   } >FLASH\n\
 \n\
-  .preinit_array     :\n\
+  .preinit_array (READONLY) :\n\
   {\n\
     PROVIDE_HIDDEN (__preinit_array_start = .);\n\
     KEEP (*(.preinit_array*))\n\
     PROVIDE_HIDDEN (__preinit_array_end = .);\n\
   } >FLASH\n\
-  .init_array :\n\
+  .init_array (READONLY) :\n\
   {\n\
     PROVIDE_HIDDEN (__init_array_start = .);\n\
     KEEP (*(SORT(.init_array.*)))\n\
     KEEP (*(.init_array*))\n\
     PROVIDE_HIDDEN (__init_array_end = .);\n\
   } >FLASH\n\
-  .fini_array :\n\
+  .fini_array (READONLY) :\n\
   {\n\
     PROVIDE_HIDDEN (__fini_array_start = .);\n\
     KEEP (*(SORT(.fini_array.*)))\n\
