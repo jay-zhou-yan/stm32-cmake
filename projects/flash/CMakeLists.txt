@@ -28,6 +28,9 @@ target_link_libraries(${PROJECT_NAME}
     HAL::STM32::F1::RCC
     HAL::STM32::F1::GPIO
     HAL::STM32::F1::CORTEX
+    HAL::STM32::F1::SPI
+    HAL::STM32::F1::RTC
+    HAL::STM32::F1::UART
     CMSIS::STM32::F103C8
     # STM32::NoSys
     STM32::Nano
